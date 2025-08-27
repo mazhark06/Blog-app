@@ -1,27 +1,69 @@
-import mongoose, {Schema} from 'mongoose'
+import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = new Schema({
-    username:{
-        type:String,
-        require:true,
-        unique:true,
-        lowercase:true
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
     },
-    password:{
-        type:String,
-        require:true
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
     },
-    avatar:{
-        type:String
+    email_Verified : {
+        type :Boolean
     },
-    gender:{
-        type:String,
-        enum:["Male", "Female"]
+    OTP:{
+        type : Number,
+        expires:5*60*1000
     },
-    Age:{
-        type:Number
+    password: {
+      type: String,
+      required: true,
     },
-  
-},{timestamps:true})
+    avatar: {
+      type: String,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female"],
+    },
+    Age: {
+      type: Number,
+    },
+  },
+  { timestamps: true }
+);
 
-export  const User = mongoose.model('User', userSchema)
+userSchema.pre("save", async function(next){
+  if(!this.isModified('password')) return next()
+  try {
+    let salt = await bcrypt.genSalt(10);
+    let hashPassword = await bcrypt.hash(this.password, salt);
+    this.password = hashPassword;
+    next()
+  } catch (error) {
+    console.log("ERROR : HASHING PASSWORD" ,error);
+  }
+});
+
+userSchema.methods.comparePassword = async function (password) {
+  try {
+    
+    let isValidPassword = await bcrypt.compare(password, this.password);
+    return isValidPassword;
+
+  } catch (error) {
+    console.log("ERROR : COMPARING PASSWORD" ,error);
+    next(error)
+
+  }
+};
+
+export const User = mongoose.model("User", userSchema);
+
+
