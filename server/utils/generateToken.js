@@ -24,7 +24,7 @@ let generateRefreshToken = async (User) => {
 let generateAccessToken = async (User) => {
   try {
     let token = await jwt.sign(
-      { username: User.username,
+      { email: User.email,
         _id:User._id
        },
       process.env.ACCESS_TOKEN_SECRET,
@@ -50,6 +50,7 @@ let verifyRefreshToken = async (token) => {
 let verifyAccessToken = async (token) => {
   
   try {
+    
     let validToken = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     return validToken
 
@@ -57,6 +58,7 @@ let verifyAccessToken = async (token) => {
     console.log("ERROR : IN VERIFY ACCESS TOKEN", error);
     return null
   }
+
 };
 export {
   generateRefreshToken,

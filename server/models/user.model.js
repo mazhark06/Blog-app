@@ -15,25 +15,33 @@ const userSchema = new Schema(
       lowercase: true,
     },
     email_Verified : {
-        type :Boolean
+        type :Boolean,
+        default:false,
     },
     OTP:{
         type : Number,
-        expires:5*60*1000
+        expires:5*60*1000,
+    },
+    otp_expireAt:{
+      type:Date,
     },
     password: {
       type: String,
       required: true,
+      select : false
     },
     avatar: {
       type: String,
+      select:false
     },
     gender: {
       type: String,
       enum: ["Male", "Female"],
+      select:false
     },
     Age: {
       type: Number,
+      select:false
     },
   },
   { timestamps: true }

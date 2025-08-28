@@ -22,14 +22,10 @@ const refreshTokensMiddleware = async (req, res, next) => {
 
       if (!refreshToken) return next();
 
-      refeshTokenDecoded = await verifyRefreshToken(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET
-      );
+      refeshTokenDecoded = await verifyRefreshToken(refreshToken);
 
-      let userDetails = await User.findById(refeshTokenDecoded._id);
 
-      let accessToken = await generateAccessToken(userDetails);
+      let accessToken = await generateAccessToken(refeshTokenDecoded);
 
       req.accessToken = accessToken;
       req.user = refeshTokenDecoded._id;
@@ -37,10 +33,7 @@ const refreshTokensMiddleware = async (req, res, next) => {
       next();
     }
 
-    let decoded = await verifyAccessToken(
-      accessToken,
-      process.env.ACCESS_TOKEN_SECRET
-    );
+    let decoded = await verifyAccessToken(accessToken);
 
     req.user = decoded._id;
     next();
